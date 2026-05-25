@@ -1,0 +1,976 @@
+/* 監視カメラ HUD スタイル */
+
+#hud-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    height: 720px;
+    pointer-events: none;
+    /* 下の要素をクリックできるようにする */
+    font-family: 'ShareTechMono', monospace;
+    color: #00ff41;
+    /* マトリックス・監視カメラ風グリーン */
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.7);
+    z-index: 9999;
+    overflow: hidden;
+}
+
+/* ゲームレイヤー全体の親コンテナ設定（ズーム・パン用） */
+.root_layer_game {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    height: 720px;
+    transition: transform 0.3s ease-out;
+    transform-origin: center center;
+}
+
+/* スキャンライン / ノイズ */
+#hud-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg,
+            rgba(255, 0, 0, 0.03),
+            rgba(0, 255, 0, 0.01),
+            rgba(0, 0, 255, 0.03));
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#hud-crt {
+    position: absolute;
+    top: -300px;
+    /* 開始位置を上に300ずらす */
+    left: 0;
+    width: 100%;
+    height: calc(100% + 300px);
+    background-image: url('../fgimage/crt.png');
+    background-size: cover;
+    pointer-events: none;
+    z-index: 30;
+    /* フレームの背面 */
+    opacity: 0.4;
+    animation: crt-move 5s linear infinite;
+    /* 等速でループ */
+}
+
+@keyframes crt-move {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(300px);
+    }
+}
+
+#hud-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../fgimage/frame.png');
+    background-size: cover;
+    pointer-events: none;
+    z-index: 50;
+    /* オーバーレイ、CRTより前面、テキストより背面 */
+}
+
+/* 時計 */
+.hud-time {
+    position: absolute;
+    top: 60px;
+    right: 80px;
+    font-size: 32px;
+    text-align: right;
+    z-index: 2100;
+}
+
+/* 部屋情報 (画面上部) */
+.hud-cam-info {
+    position: absolute;
+    top: 60px;
+    left: 80px;
+    font-size: 28px;
+    z-index: 2100;
+}
+
+/* ナビゲーションボタン (画面上部) */
+#hud-nav {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    pointer-events: auto;
+    /* ボタンはクリック可能にする */
+    z-index: 2100;
+}
+
+.nav-btn {
+    position: relative; /* 疑似要素による当たり判定拡張の基準 */
+    background: rgba(0, 20, 0, 0.6);
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    padding: 10px 22px;
+    font-family: 'ShareTechMono', monospace;
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* ボタンの周囲をクリック可能な当たり判定領域として拡張（上方向はさらに10px広げて計20px） */
+.nav-btn::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+}
+
+/* HUDボタンのフォーカス時のアウトライン（選択線）を非表示にする */
+.nav-btn:focus,
+.nav-btn:active,
+.nav-btn:focus-visible,
+.zoom-btn:focus,
+.zoom-btn:active,
+.zoom-btn:focus-visible,
+#gun-btn:focus,
+#gun-btn:active,
+#gun-btn:focus-visible {
+    outline: none !important;
+}
+
+.nav-btn:hover {
+    background: #00ff41;
+    color: #000;
+}
+
+.nav-btn.active {
+    background: #00ff41;
+    color: #000;
+    box-shadow: 0 0 15px #00ff41;
+}
+
+/* バッテリー表示風（おまけ） */
+.hud-battery {
+    position: absolute;
+    top: 100px;
+    left: 80px;
+    width: 100px;
+    height: 15px;
+    border: 1px solid #00ff41;
+    padding: 2px;
+    z-index: 2100;
+}
+
+.hud-battery-fill {
+    width: 85%;
+    height: 100%;
+    background: #00ff41;
+}
+
+/* ノイズオーバーレイ（切り替え時） */
+#hud-noise {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../fgimage/noise01.png');
+    background-size: cover;
+    z-index: 10000;
+    display: none;
+    pointer-events: none;
+}
+
+/* --- 砂嵐専用レイヤー (Sandstorm Layer) --- */
+#hud-sandstorm {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../fgimage/sandstorm.jpg');
+    background-size: cover;
+    z-index: 2; /* CRT等の下、背景画像の上 */
+    display: none;
+    pointer-events: none;
+}
+
+#hud-sandstorm.active {
+    display: block;
+    animation: sandstorm-flip-anim 0.08s infinite steps(1) !important;
+}
+
+/* 砂嵐時のノイズオーバーレイ強制表示 */
+#hud-noise.sandstorm-active {
+    display: block !important;
+    animation: sandstorm-noise-anim 0.08s infinite !important;
+}
+
+@keyframes sandstorm-flip-anim {
+    0% {
+        transform: scale(1, 1);
+    }
+
+    25% {
+        transform: scale(-1, 1);
+    }
+
+    50% {
+        transform: scale(-1, -1);
+    }
+
+    75% {
+        transform: scale(1, -1);
+    }
+
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
+@keyframes sandstorm-noise-anim {
+    0% {
+        opacity: 0.6;
+        transform: scale(1, 1);
+    }
+
+    25% {
+        opacity: 0.9;
+        transform: scale(1, -1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(-1, 1);
+    }
+
+    75% {
+        opacity: 0.9;
+        transform: scale(-1, -1);
+    }
+
+    100% {
+        opacity: 0.6;
+        transform: scale(1, 1);
+    }
+}
+
+
+
+/* 上下反転演出 */
+.layer_camera.is-upside-down {
+    transform: scaleY(-1);
+}
+
+/* 左右反転演出 */
+.layer_camera.is-mirror {
+    transform: scaleX(-1);
+}
+
+/* 強力なノイズ演出（撃退成功時など） */
+.is-strong-noise #hud-noise {
+    display: block !important;
+    background-image: url('../fgimage/noise02.png') !important;
+    animation: sandstorm-noise-anim 0.05s infinite !important;
+    opacity: 1 !important;
+}
+
+
+/* --- 銃モード (Gun Mode) --- */
+
+/* 銃ボタン（右側） */
+#hud-gun-btn-container {
+    position: absolute;
+    top: 240px;
+    right: 50px;
+    /* 銃ボタンは右側に戻す */
+    z-index: 2000;
+    pointer-events: auto;
+}
+
+#hud-zoom-btn-container {
+    position: absolute;
+    top: 430px;
+    right: 60px;
+    /* ズームボタンは銃と弾薬の下に配置 */
+    z-index: 2000;
+    pointer-events: auto;
+}
+
+#gun-btn {
+    width: 80px;
+    height: 80px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #00ff41;
+    color: #fff;
+    font-family: 'ShareTechMono', monospace;
+    font-size: 14px;
+    cursor: pointer;
+    transition: none;
+    /* ぱっと切り替わるように */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    /* ズームボタンとの間隔 */
+}
+
+#hud-zoom-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.zoom-btn {
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #00ff41;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.zoom-btn:hover:not(:disabled) {
+    background: rgba(0, 255, 65, 0.2);
+}
+
+.zoom-btn:disabled,
+.zoom-btn.disabled {
+    border-color: #666;
+    background: rgba(40, 40, 40, 0.6);
+    cursor: not-allowed;
+    filter: grayscale(1);
+    opacity: 0.5;
+}
+
+.zoom-icon {
+    width: 30px;
+    height: 30px;
+}
+
+/* ズーム拡大中のドラッグ可能状態 */
+.zoom-panning {
+    cursor: grab;
+    pointer-events: auto !important;
+}
+
+/* ドラッグ中 */
+.is-panning {
+    cursor: grabbing !important;
+}
+
+#gun-btn:hover {
+    background: rgba(0, 255, 65, 0.2);
+    color: #00ff41;
+}
+
+#gun-btn:hover .gun-icon {
+    /* 白から緑にフィルタで変更 */
+    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
+}
+
+#gun-btn.active {
+    background: #00ff41;
+    color: #000;
+    box-shadow: 0 0 15px #00ff41;
+}
+
+#gun-btn.active .gun-icon {
+    /* 緑の背景に対して黒っぽくする */
+    filter: brightness(0);
+}
+
+.gun-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 5px;
+    /* transition: none; 不要（デフォルト） */
+}
+
+/* 照準（カスタムDOM） */
+#hud-crosshair {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150' viewBox='0 0 150 150' stroke='%2300ff41' stroke-width='2' fill='none'%3E%3Cline x1='75' y1='0' x2='75' y2='150'/%3E%3Cline x1='0' y1='75' x2='150' y2='75'/%3E%3C/svg%3E");
+    background-size: contain;
+    pointer-events: none;
+    z-index: 5;
+    /* ノイズやフレームの背面 */
+    display: none;
+}
+
+/* 銃モード中の画面全体のクリック反応レイヤー */
+#gun-trigger-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    /* ボタンよりは下 */
+    display: none;
+    /* 大きく赤い照準カーソルはDOMで実装したので、ここは消す */
+    cursor: none;
+    pointer-events: auto;
+}
+
+/* アニメーション：画面の揺れ */
+@keyframes shoot-shake {
+    0% {
+        translate: 0 0;
+    }
+
+    10% {
+        translate: -12px -15px;
+    }
+
+    /* 以前の3〜5倍程度に強化 */
+    20% {
+        translate: 15px 12px;
+    }
+
+    30% {
+        translate: -10px 5px;
+    }
+
+    40% {
+        translate: 8px -8px;
+    }
+
+    100% {
+        translate: 0 0;
+    }
+}
+
+.animate-shoot-shake {
+    animation: shoot-shake 0.25s ease-in-out;
+    /* わずかに長くして余韻を出す */
+}
+
+/* 照準のリコイル（反動）：一瞬下にズレてから上に跳ね上がる */
+@keyframes crosshair-recoil {
+    0% {
+        transform: translateY(0);
+    }
+
+    15% {
+        transform: translateY(40px);
+    }
+
+    /* 沈み込みをさらに深く (15px -> 40px) */
+    30% {
+        transform: translateY(-70px);
+    }
+
+    /* 跳ね上がり */
+    100% {
+        transform: translateY(0);
+    }
+
+    /* 元に戻る */
+}
+
+.animate-crosshair-recoil {
+    animation: crosshair-recoil 0.3s ease-out;
+    /* 少しだけ長くして動きを見せる */
+}
+
+/* 残弾数表示 (Bullets) */
+#hud-bullets-container {
+    position: absolute;
+    top: 329px;
+    /* 以前の 429 から 100px アップ */
+    right: 41px;
+    /* 45 - 4 (右へ4px) */
+    width: auto;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 3px;
+    z-index: 2000;
+    pointer-events: none;
+}
+
+.bullet-icon {
+    width: 18px;
+    height: 18px;
+    filter: drop-shadow(0 0 5px rgba(0, 255, 65, 0.5));
+    transition: all 0.3s ease-out;
+}
+
+.bullet-icon.spent {
+    opacity: 0.1;
+    filter: grayscale(1) brightness(0.2);
+    transform: translateY(10px) rotate(15deg);
+}
+
+/* 発砲時の弾丸のアニメーション（新しい弾が減る瞬間用など） */
+@keyframes bullet-fire {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+    50% {
+        transform: scale(1.5);
+        filter: brightness(2) drop-shadow(0 0 10px #00ff41);
+    }
+
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+/* メッセージ中央揃え用：1文字ずつ中央から広がる表示に対応 */
+#message0_foreground .message_inner,
+.message_center .message_inner,
+.message0_foreground .message_inner {
+    text-align: center !important;
+    width: 100% !important;
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    z-index: 10001 !important;
+    color: white !important;
+}
+
+
+/* 1文字単位の要素（.char）をインラインフローに戻し、中央寄せを効かせる */
+.message_inner .char,
+.message_inner p span,
+.message_inner p .char {
+    display: inline-block !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    float: none !important;
+}
+
+/* pタグ自体の幅を100%にして中央寄せの基準を作る */
+.message_inner p {
+    text-align: center !important;
+    width: 100% !important;
+    display: block !important;
+}
+
+/* セリフテキストのフォントを強制適用 */
+.message_inner,
+.message_inner .char,
+.message_inner p span,
+.message_inner p .char {
+    font-family: 'DotGothic16', sans-serif !important;
+    color: white !important;
+}
+
+
+/* --- モニター電源オフ演出 (CRT Turn Off) --- */
+
+@keyframes crt-off {
+    0% {
+        clip-path: inset(0 0 0 0);
+        filter: brightness(1);
+    }
+
+    50% {
+        clip-path: inset(49.8% 0 49.8% 0);
+        /* まず横一行に収束 */
+        filter: brightness(4);
+        opacity: 1;
+    }
+
+    85% {
+        clip-path: inset(49.8% 49.8% 49.8% 49.8%);
+        /* 中心の一点に収束 */
+        filter: brightness(10);
+        opacity: 1;
+    }
+
+    100% {
+        clip-path: inset(50% 50% 50% 50%);
+        filter: brightness(20);
+        opacity: 0;
+    }
+}
+
+.crt-turn-off {
+    animation: crt-off 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards !important;
+    background-color: black !important;
+}
+
+/* --- チャットログ演出 (Chat Log) --- */
+
+#hud-chat-log {
+    position: absolute;
+    bottom: 80px;
+    /* 以前のメッセージウィンドウ付近 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 8px;
+    pointer-events: none;
+    z-index: 2200;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.chat-item {
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 22px;
+    background: rgba(0, 30, 7, 0.5);
+    backdrop-filter: blur(4px);
+    border-left: 4px solid #00ff41;
+    padding: 10px 20px;
+    animation: chat-entry 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    display: flex;
+    align-items: baseline;
+    gap: 15px;
+    border-radius: 0 4px 4px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s;
+}
+
+.chat-name {
+    color: #00ff41;
+    font-weight: bold;
+    min-width: 100px;
+    text-transform: uppercase;
+    font-size: 18px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
+}
+
+.chat-text {
+    color: #fff;
+    line-height: 1.4;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes chat-entry {
+    0% {
+        opacity: 0;
+        transform: translateX(-30px);
+        filter: blur(5px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* --- システムメッセージ（終了時の元のスタイルを再現） --- */
+
+#hud-system-message {
+    position: absolute;
+    top: 500px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1280px;
+    text-align: center;
+    pointer-events: none;
+    z-index: 2300;
+    animation: sys-entry 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.sys-name {
+    color: #00ff41;
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 28px;
+    min-height: 28px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
+}
+
+.sys-text {
+    color: #fff;
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 24px;
+    line-height: 1.5;
+    min-height: 36px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+.sys-staff {
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    font-family: "SHSerifJP", serif !important;
+    animation: staff-fade-in 1.0s ease-out forwards !important;
+}
+
+.sys-staff .sys-text {
+    font-size: 32px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    text-align: center;
+    font-family: "SHSerifJP", serif !important;
+}
+
+.sys-staff-role {
+    color: #00ff41;
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-align: center;
+    font-family: "SHSerifJP", serif !important;
+}
+
+@keyframes staff-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+#staff-skip-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    padding: 4px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 0.5px solid rgba(0, 255, 65, 0.4);
+    color: rgba(0, 255, 65, 0.5);
+    font-family: 'ShareTechMono', monospace;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 10001;
+    /* blockerより上 */
+    pointer-events: auto;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+}
+
+#staff-skip-btn:hover {
+    background: rgba(0, 255, 65, 0.2);
+    color: #00ff41;
+    border-color: #00ff41;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+}
+
+@keyframes sys-entry {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+
+/* --- タイトル画面用スタイル --- */
+
+.start_txt {
+    pointer-events: none !important;
+    transition: color 0.1s ease-in-out;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    /* 視認性向上のための影 */
+    z-index: 100 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.start_btn_hit:hover+.start_txt {
+    color: #00ff41 !important;
+}
+
+/* --- [glink name="title_btn"] の共通設定 --- */
+.title_btn.glink_button {
+    background-image: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transition: none !important;
+    font-family: 'ShareTechMono', sans-serif !important;
+}
+
+/* Startボタンを「ボタンらしく」し、中央に配置 */
+.start_btn.glink_button {
+    background-color: rgba(0, 40, 0, 0.7) !important;
+    border: 1px solid #00ff41 !important;
+    padding: 10px 40px !important;
+    border-radius: 4px !important;
+    text-shadow: 0 0 10px #00ff41 !important;
+    letter-spacing: 4px !important;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.2) !important;
+
+    /* 左右中央寄せ */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+
+/* Startボタン：ホバー時 */
+.start_btn.glink_button:hover {
+    background-color: #00ff41 !important;
+    color: #000 !important;
+    box-shadow: 0 0 25px #00ff41 !important;
+    text-shadow: none !important;
+}
+
+/* タイトル画面のアイコンボタン（trash/sound）のホバー設定 */
+img.title_btn {
+    transition: filter 0.2s;
+}
+
+img.title_btn:hover {
+    /* 白から緑（#00ff41）にフィルタで変更 */
+    filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%);
+}
+
+
+/* --- デバッグ用機能 (Debug Features) --- */
+.debug-advance-time {
+    position: absolute;
+    top: 120px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #00ff41;
+    border: 1px solid #00ff41;
+    padding: 12px 20px;
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10000;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+    border-radius: 2px;
+    pointer-events: auto;
+    user-select: none;
+}
+
+.debug-advance-time::before {
+    content: ">> ";
+    opacity: 0.7;
+}
+
+.debug-advance-time:hover {
+    background: #00ff41;
+    color: #000;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+    transform: translateY(-2px);
+}
+
+.debug-advance-time:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+/* カメラロックエラー演出 */
+#hud-camera-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(200, 0, 0, 0.9);
+    color: #fff;
+    padding: 30px 60px;
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 64px;
+    font-weight: bold;
+    border: 6px solid #fff;
+    z-index: 15000;
+    display: none;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(255, 0, 0, 1);
+    pointer-events: none;
+    line-height: 1.2;
+}
+
+#error-timer {
+    font-size: 48px;
+    display: block;
+    margin-top: 10px;
+}
+
+.error-blink {
+    animation: error-blink-anim 0.4s infinite;
+}
+
+@keyframes error-blink-anim {
+    0% {
+        opacity: 1;
+        border-color: #fff;
+    }
+
+    50% {
+        opacity: 0.7;
+        border-color: #ff0000;
+    }
+
+    100% {
+        opacity: 1;
+        border-color: #fff;
+    }
+}
+
+/* デバッグ分岐ルート表示 */
+.debug-branch-indicator {
+    position: absolute;
+    top: 185px;
+    right: 20px;
+    background: rgba(255, 0, 0, 0.8);
+    color: #fff;
+    border: 1px solid #ff0000;
+    padding: 8px 15px;
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 10000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+    border-radius: 2px;
+    pointer-events: none;
+    animation: blink-red 1s infinite alternate;
+}
+
+@keyframes blink-red {
+    from {
+        opacity: 0.7;
+        box-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
+    }
+    to {
+        opacity: 1.0;
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+    }
+}
+
+/* ペナルティ用ぼかし演出 */
+.layer_camera.is-blurred-penalty {
+    filter: blur(30px) !important;
+    transition: filter 0.3s ease;
+}

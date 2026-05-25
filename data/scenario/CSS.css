@@ -1,0 +1,624 @@
+/* ========================================= */
+/*  フォント設定
+/* ========================================= */
+
+@font-face {
+  font-family: "SHSerifJP";
+  src: url("../others/SHSerifJP.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "DotGothic16";
+  src: url("../others/DotGothic16.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "ShareTechMono";
+  src: url("../others/ShareTechMono.ttf") format("truetype");
+  font-style: normal;
+}
+
+
+.font-shserif {
+  font-family: "SHSerifJP", serif;
+}
+
+/* ========================================= */
+/*  タイトル画面
+/* ========================================= */
+/* Title Background Animation */
+
+.title_bg { 
+    animation: handheld-sway 12s ease-in-out infinite !important; 
+    transform-origin: center center; 
+}
+@keyframes handheld-sway {
+  0%   { transform: scale(1) translate(0, 0); }
+  25%  { transform: scale(1) translate(10px, 8px); }
+  50%  { transform: scale(1) translate(-8px, 12px); }
+  75%  { transform: scale(1) translate(12px, -6px); }
+  100% { transform: scale(1) translate(0, 0); }
+}
+
+/* Title UI Style */
+
+.title_text {
+    text-shadow: 0 0 15px #00ff41, 0 0 30px rgba(0, 255, 65, 0.5);
+    letter-spacing: 12px;
+    font-weight: bold;
+    opacity: 0.9;
+}
+
+.title_logo {
+    left: 50% !important;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 0 8px #00ff41) drop-shadow(0 0 15px rgba(0, 255, 65, 0.3));
+    opacity: 0.9;
+}
+
+
+.start_btn {
+    text-shadow: 0 0 10px #00ff41 !important;
+    border: 1px solid #00ff41 !important;
+    background: rgba(0, 40, 0, 0.6) !important;
+    padding: 15px 60px !important;
+    border-radius: 2px !important;
+    transition: none !important;
+    letter-spacing: 4px !important;
+    box-shadow: 0 0 5px rgba(0, 255, 65, 0.2) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+.start_btn:hover {
+    background: #00ff41 !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px #00ff41 !important;
+}
+
+.title_btn:not(.start_btn) {
+    text-shadow: 0 0 8px #00ff41 !important;
+    opacity: 0.7 !important;
+    transition: opacity 0.2s !important;
+}
+.title_btn:not(.start_btn):hover {
+    opacity: 1 !important;
+}
+
+.title_btn.report_btn {
+    text-shadow: 0 0 10px #00ff41 !important;
+    border: 1px solid #00ff41 !important;
+    background: rgba(0, 40, 0, 0.6) !important;
+    padding: 7px 30px !important; /* スタートボタン(15px 60px)より二回り小さく細く */
+    border-radius: 2px !important;
+    transition: none !important;
+    letter-spacing: 2px !important;
+    box-shadow: 0 0 5px rgba(0, 255, 65, 0.2) !important;
+    opacity: 1 !important; /* 他のtitle_btnの不透明度制限を回避 */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
+.title_btn.report_btn:hover {
+    background: #00ff41 !important;
+    color: #000 !important;
+    box-shadow: 0 0 15px #00ff41 !important;
+    opacity: 1 !important;
+}
+
+/* ========================================= */
+/* 削除画面 */
+/* ========================================= */
+/* Delete Overlay Style */
+
+#delete_overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100000000;
+}
+
+.delete_title {
+    font-size: 28px;
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+    font-weight: bold;
+    border-bottom: 2px solid #00ff41;
+    padding-bottom: 15px;
+}
+
+.delete_subtitle {
+    font-size: 20px;
+    font-weight: normal;
+    letter-spacing: 2px;
+    margin-top: 12px;
+    display: inline-block;
+    opacity: 0.8;
+    font-family: 'DotGothic16', sans-serif;
+}
+
+.delete_btn_area {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.delete_btn {
+    padding: 15px 45px;
+    border: 1px solid #00ff41;
+    background: rgba(0, 40, 0, 0.6);
+    color: #00ff41;
+    cursor: pointer;
+    font-family: 'ShareTechMono', 'DotGothic16', monospace;
+    font-size: 26px;
+    letter-spacing: 3px;
+    box-shadow: 0 0 5px rgba(0, 255, 65, 0.2);
+    transition: none;
+    outline: none;
+}
+.delete_btn:hover {
+    background: #00ff41;
+    color: #000;
+    box-shadow: 0 0 15px #00ff41;
+}
+
+/* ========================================= */
+/*  サウンド
+/* ========================================= */
+/* Sound Config Style */
+
+#config_overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100000000;
+}
+
+.config_blocker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+.config_box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    padding: 40px;
+    background: rgba(0, 20, 0, 0.8);
+    border: 2px solid #00ff41;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.5), inset 0 0 10px rgba(0, 255, 65, 0.2);
+    font-family: 'ShareTechMono', 'DotGothic16', monospace;
+    color: #00ff41;
+    text-align: center;
+    z-index: 2;
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.8);
+}
+
+.config_title {
+    font-size: 32px;
+    margin-bottom: 40px;
+    letter-spacing: 6px;
+    font-weight: bold;
+    border-bottom: 2px solid #00ff41;
+    padding-bottom: 15px;
+}
+
+.config_volume_area {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin: 15px 0;
+}
+
+.config_container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.config_label {
+    font-size: 26px;
+    letter-spacing: 3px;
+}
+
+.config_box input[type=range] {
+    -webkit-appearance: none;
+    background: rgba(0, 255, 65, 0.2);
+    height: 8px;
+    outline: none;
+    width: 100%;
+    cursor: pointer;
+}
+.config_box input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 36px;
+    background: #00ff41;
+    cursor: pointer;
+    border: 1px solid #000;
+    box-shadow: 0 0 5px #00ff41;
+}
+
+/* ========================================= */
+/*  レポート画面 (Report Overlay Style)
+/* ========================================= */
+
+#report_overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100000000;
+}
+
+.report_box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 960px;
+    height: 560px;
+    padding: 30px;
+    background: rgba(0, 15, 0, 0.92);
+    border: 2px solid #00ff41;
+    box-shadow: 0 0 25px rgba(0, 255, 65, 0.4), inset 0 0 15px rgba(0, 255, 65, 0.15);
+    font-family: 'ShareTechMono', 'DotGothic16', monospace;
+    color: #00ff41;
+    z-index: 2;
+    display: flex;
+    flex-direction: row;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.report_sidebar {
+    width: 210px;
+    border-right: 1px solid rgba(0, 255, 65, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 15px;
+    box-sizing: border-box;
+}
+
+.report_content_area {
+    flex: 1;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    height: 100%;
+    overflow: hidden;
+}
+
+.report_content_title {
+    font-size: 22px;
+    font-weight: bold;
+    border-bottom: 2px solid #00ff41;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.8);
+    font-family: 'DotGothic16', 'ShareTechMono', monospace;
+}
+
+.report_content_body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+    padding-right: 15px;
+    text-align: left;
+    line-height: 1.8;
+    font-size: 16px;
+    white-space: pre-wrap;
+    font-family: 'SHSerifJP', 'DotGothic16', sans-serif;
+    color: rgba(0, 255, 65, 0.9);
+}
+
+/* スクロールバーカスタム */
+.report_content_body::-webkit-scrollbar {
+    width: 10px;
+}
+.report_content_body::-webkit-scrollbar-track {
+    background: rgba(0, 255, 65, 0.05);
+}
+.report_content_body::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 65, 0.4);
+    border-radius: 3px;
+}
+.report_content_body::-webkit-scrollbar-thumb:hover {
+    background: #00ff41;
+}
+
+/* タブボタン */
+.report_tab_btn {
+    padding: 11px 12px;
+    background: rgba(0, 30, 0, 0.4);
+    border: 1px solid rgba(0, 255, 65, 0.4);
+    color: rgba(0, 255, 65, 0.7);
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: 'DotGothic16', 'ShareTechMono', monospace;
+    outline: none;
+}
+.report_tab_btn:hover {
+    background: rgba(0, 50, 0, 0.6);
+    color: #00ff41;
+    border-color: #00ff41;
+    box-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+}
+.report_tab_btn.active {
+    background: #00ff41;
+    color: #000;
+    font-weight: bold;
+    border-color: #00ff41;
+    box-shadow: 0 0 12px #00ff41;
+}
+
+/* 閉じるボタン */
+.report_close_btn {
+    margin-top: auto;
+    padding: 12px 15px;
+    border: 1px solid #ff4141;
+    background: rgba(40, 0, 0, 0.4);
+    color: #ff4141;
+    cursor: pointer;
+    font-family: 'ShareTechMono', 'DotGothic16', monospace;
+    font-size: 16px;
+    letter-spacing: 2px;
+    text-align: center;
+    box-shadow: 0 0 5px rgba(255, 65, 65, 0.2);
+    transition: all 0.15s ease;
+    outline: none;
+}
+.report_close_btn:hover {
+    background: #ff4141;
+    color: #000;
+    box-shadow: 0 0 15px #ff4141;
+}
+
+/* ========================================= */
+/*  極秘調査報告書スタイル (Classified Report Style)
+/* ========================================= */
+
+.report-confidential {
+    display: inline-block;
+    border: 1px solid #ff4141;
+    color: #ff4141;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    text-shadow: 0 0 5px rgba(255, 65, 65, 0.5);
+    box-shadow: 0 0 5px rgba(255, 65, 65, 0.2);
+}
+
+.report-header {
+    border-bottom: 1px dashed rgba(0, 255, 65, 0.5);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.report-title-main {
+    font-size: 20px;
+    font-weight: bold;
+    color: #00ff41;
+    margin: 5px 0;
+    text-shadow: 0 0 8px rgba(0, 255, 65, 0.6);
+}
+
+.report-date {
+    font-size: 13px;
+    color: rgba(0, 255, 65, 0.7);
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.report-section-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: #00ff41;
+    border-left: 4px solid #00ff41;
+    padding-left: 10px;
+    margin: 25px 0 15px 0;
+    background: rgba(0, 255, 65, 0.08);
+    display: block;
+    line-height: 1.6;
+}
+
+.report-paragraph {
+    margin-bottom: 15px;
+    text-indent: 1em;
+}
+
+.report-paragraph-no-indent {
+    margin-bottom: 15px;
+}
+
+.report-warning-box {
+    border: 1px solid rgba(255, 165, 0, 0.5);
+    background: rgba(255, 165, 0, 0.05);
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.report-warning-title {
+    color: #ffa500;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-shadow: 0 0 5px rgba(255, 165, 0, 0.5);
+}
+
+.report-list {
+    list-style: none;
+    padding-left: 15px;
+    margin: 10px 0;
+}
+
+.report-list-item {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 8px;
+}
+
+.report-list-item::before {
+    content: "■";
+    position: absolute;
+    left: 0;
+    color: #00ff41;
+    font-size: 12px;
+    top: 2px;
+}
+
+.report-list-item-warning {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 8px;
+}
+
+.report-list-item-warning::before {
+    content: "▲";
+    position: absolute;
+    left: 0;
+    color: #ffa500;
+    font-size: 12px;
+    top: 2px;
+}
+
+.report-footer {
+    margin-top: 30px;
+    border-top: 1px dashed rgba(0, 255, 65, 0.3);
+    padding-top: 15px;
+    font-size: 12px;
+    color: rgba(0, 255, 65, 0.6);
+}
+
+/* ロックされたタブボタン */
+.report_tab_btn.locked {
+    color: rgba(255, 65, 65, 0.7);
+    border-color: rgba(255, 65, 65, 0.55); /* 枠線を見えやすくするため透過度を 0.55 に引き上げ */
+    background: rgba(35, 0, 0, 0.45); /* 背景の存在感を少し強める */
+    text-shadow: 0 0 4px rgba(255, 65, 65, 0.4);
+    text-align: center; /* アイコンを中央に表示するため */
+}
+.report_tab_btn.locked:hover {
+    background: rgba(50, 0, 0, 0.55);
+    color: rgba(255, 65, 65, 0.85);
+    border-color: rgba(255, 65, 65, 0.6);
+    box-shadow: 0 0 8px rgba(255, 65, 65, 0.3);
+    text-shadow: 0 0 8px rgba(255, 65, 65, 0.8);
+}
+.report_tab_btn.locked.active {
+    background: #ff4141;
+    color: #000;
+    font-weight: bold;
+    border-color: #ff4141;
+    box-shadow: 0 0 12px #ff4141;
+    text-shadow: none;
+}
+
+/* ロックアイコンのスタイル調整 */
+.report_tab_btn.locked img.report_lock_icon {
+    transition: filter 0.15s ease, opacity 0.15s ease;
+}
+.report_tab_btn.locked:hover img.report_lock_icon {
+    opacity: 0.95 !important;
+}
+.report_tab_btn.locked.active img.report_lock_icon {
+    opacity: 1 !important;
+    filter: brightness(0); /* 赤地に黒文字なので、アイコンも黒にする */
+}
+
+/* ========================================= */
+/*  実績解除トースト (Achievement Toast Style)
+/* ========================================= */
+
+.achievement-toast {
+    position: absolute;
+    top: 20px;
+    left: -320px; /* 初期状態は画面外左 */
+    width: 280px;
+    background: rgba(0, 15, 5, 0.9);
+    border-left: 4px solid #00ff41;
+    border-top: 1px solid rgba(0, 255, 65, 0.3);
+    border-right: 1px solid rgba(0, 255, 65, 0.3);
+    border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.2), inset 0 0 10px rgba(0, 255, 65, 0.1);
+    color: #ffffff;
+    font-family: 'ShareTechMono', 'DotGothic16', sans-serif;
+    padding: 12px 16px;
+    z-index: 11000;
+    transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+    opacity: 0;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.achievement-toast.show {
+    left: 20px; /* 画面内にスライドイン */
+    opacity: 1;
+}
+
+.achievement-toast.hide {
+    left: -320px; /* 左へスライドアウト */
+    opacity: 0;
+}
+
+.achievement-toast-header {
+    font-size: 11px;
+    color: #00ff41;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: bold;
+}
+
+.achievement-toast-header::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #00ff41;
+    box-shadow: 0 0 5px #00ff41;
+    border-radius: 50%;
+    animation: toast-pulse 1s infinite alternate;
+}
+
+@keyframes toast-pulse {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+}
+
+.achievement-toast-body {
+    font-size: 14px;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
